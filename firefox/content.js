@@ -1,5 +1,13 @@
 // Multi LLM Hub - Content Script
-console.log('Multi LLM Hub content script loaded on:', window.location.href);
+(function() {
+    console.log('Multi LLM Hub content script loaded on:', window.location.href);
+
+    // Prevent multiple script execution
+    if (typeof window.multiLLMHubLoaded !== 'undefined') {
+        console.log('Multi LLM Hub content script already loaded, skipping...');
+        return;
+    }
+    window.multiLLMHubLoaded = true;
 
 // Load LLM config if not already available
 if (typeof LLM_CONFIG === 'undefined') {
@@ -151,6 +159,11 @@ class LLMInjector {
         // Focus the input
         input.focus();
 
+        // Special handling for Perplexity's complex structure
+        if (window.location.href.includes('perplexity.ai')) {
+            return this.handlePerplexityInput(input, value);
+        }
+
         // Handle different input types
         if (input.contentEditable === 'true') {
             // Contenteditable div
@@ -159,6 +172,10 @@ class LLMInjector {
             
             // Trigger events for contenteditable
             this.triggerEvents(input, ['input', 'change']);
+        } else if (input.tagName === 'P' || input.tagName === 'SPAN') {
+            // Handle paragraph or span elements (like Perplexity)
+            input.textContent = value;
+            this.triggerEvents(input, ['input', 'change', 'keyup']);
         } else {
             // Regular input/textarea
             input.value = '';
@@ -183,6 +200,33 @@ class LLMInjector {
         // Wait a bit for the UI to update
         await this.sleep(100);
     }
+
+    async handlePerplexityInput(input, value) {
+        // Always target the outer editable div
+        let editableElement = input.closest('#ask-input[contenteditable="true"]') || input;
+    
+        if (!editableElement) {
+            console.error("Perplexity: editable element not found");
+            return;
+        }
+    
+        // Focus the editor
+        editableElement.focus();
+    
+        // Clear existing content
+        document.execCommand('selectAll', false, null);
+        document.execCommand('delete', false, null);
+    
+        // Insert new text as if typed by a user
+        document.execCommand('insertText', false, value);
+    
+        // Fire input event so Lexical editor updates its internal state
+        editableElement.dispatchEvent(new InputEvent('input', { bubbles: true }));
+    
+        // Small delay to let UI react
+        await this.sleep(150);
+    }
+    
 
     async trySubmit(config, input) {
         try {
@@ -257,5 +301,8 @@ class LLMInjector {
     }
 }
 
-// Initialize the injector
-new LLMInjector();
+    // Initialize the injector only if not already initialized
+    if (typeof window.llmInjectorInstance === 'undefined') {
+        window.llmInjectorInstance = new LLMInjector();
+    }
+})();
