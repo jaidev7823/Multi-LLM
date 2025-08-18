@@ -1,0 +1,34 @@
+{
+    "manifest_version": 3,
+    "name": "Multi LLM Broadcaster",
+    "version": "0.2",
+    "description": "Send one prompt to ChatGPT & DeepSeek tabs",
+    "permissions": [
+      "tabs",
+      "scripting",
+      "activeTab"
+    ],
+    "host_permissions": [
+        "*://chat.openai.com/*",
+        "*://chatgpt.com/*",
+        "*://*.deepseek.com/*",
+        "*://chat.deepseek.com/*"
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": [
+          "*://chat.openai.com/*",
+          "*://chatgpt.com/*",
+          "*://*.deepseek.com/*"
+        ],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
