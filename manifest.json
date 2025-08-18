@@ -1,34 +1,60 @@
 {
-    "manifest_version": 3,
-    "name": "Multi LLM Broadcaster",
-    "version": "0.2",
-    "description": "Send one prompt to ChatGPT & DeepSeek tabs",
-    "permissions": [
-      "tabs",
-      "scripting",
-      "activeTab"
-    ],
-    "host_permissions": [
+  "manifest_version": 3,
+  "name": "Multi LLM Hub",
+  "version": "1.0",
+  "description": "Interact with multiple LLMs from one interface - ChatGPT, Claude, Gemini, and more",
+  "permissions": [
+    "tabs",
+    "scripting",
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://chat.openai.com/*",
+    "*://chatgpt.com/*",
+    "*://claude.ai/*",
+    "*://gemini.google.com/*",
+    "*://bard.google.com/*",
+    "*://chat.deepseek.com/*",
+    "*://*.deepseek.com/*",
+    "*://poe.com/*",
+    "*://chat.mistral.ai/*",
+    "*://chat.cohere.com/*",
+    "*://huggingface.co/*",
+    "*://you.com/*",
+    "*://perplexity.ai/*",
+    "*://character.ai/*",
+    "*://replicate.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
         "*://chat.openai.com/*",
         "*://chatgpt.com/*",
+        "*://claude.ai/*",
+        "*://gemini.google.com/*",
+        "*://bard.google.com/*",
+        "*://chat.deepseek.com/*",
         "*://*.deepseek.com/*",
-        "*://chat.deepseek.com/*"
-    ],
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "background": {
-      "service_worker": "background.js"
-    },
-    "content_scripts": [
-      {
-        "matches": [
-          "*://chat.openai.com/*",
-          "*://chatgpt.com/*",
-          "*://*.deepseek.com/*"
-        ],
-        "js": ["content.js"]
-      }
-    ]
-  }
-  
+        "*://poe.com/*",
+        "*://chat.mistral.ai/*",
+        "*://chat.cohere.com/*",
+        "*://huggingface.co/*",
+        "*://you.com/*",
+        "*://perplexity.ai/*",
+        "*://character.ai/*",
+        "*://replicate.com/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "options_page": "settings.html"
+}

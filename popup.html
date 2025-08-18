@@ -1,75 +1,362 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Multi LLM Broadcaster</title>
+    <title>Multi LLM Hub</title>
     <style>
-        body {
-            width: 350px;
-            padding: 15px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        * {
             margin: 0;
-        }
-        
-        h3 {
-            margin: 0 0 15px 0;
-            color: #333;
-            font-size: 16px;
-        }
-        
-        #prompt {
-            width: 100%;
-            height: 80px;
-            padding: 10px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            font-size: 14px;
-            resize: vertical;
+            padding: 0;
             box-sizing: border-box;
-            font-family: inherit;
         }
         
-        #prompt:focus {
-            outline: none;
-            border-color: #007cba;
+        body {
+            width: 400px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
         }
         
-        #send {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            background: #007cba;
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: none;
-            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
             font-size: 14px;
             font-weight: 500;
+            color: #6c757d;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #f8f9ff;
+        }
+        
+        .tab:hover {
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background: white;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Search Tab Styles */
+        .search-section {
+            margin-bottom: 20px;
+        }
+        
+        .prompt-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        .prompt-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .llm-selector {
+            margin-bottom: 15px;
+        }
+        
+        .llm-selector h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .llm-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .llm-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .llm-chip.enabled {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .llm-chip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .send-button {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
             transition: background-color 0.2s;
         }
         
-        #send:hover {
-            background: #005a8b;
+        .send-button:hover {
+            background: #5a6fd8;
         }
         
-        #send:active {
-            background: #004a73;
+        .send-button:disabled {
+            background: #adb5bd;
+            cursor: not-allowed;
         }
         
-        #status {
-            margin-top: 10px;
-            padding: 8px;
-            border-radius: 4px;
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
             font-size: 12px;
             line-height: 1.4;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        /* Settings Tab Styles */
+        .settings-section {
+            margin-bottom: 25px;
+        }
+        
+        .settings-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .llm-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .llm-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .llm-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .llm-icon {
+            font-size: 18px;
+        }
+        
+        .llm-details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 2px;
+        }
+        
+        .llm-details p {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .toggle-switch.enabled {
+            background: #667eea;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+        }
+        
+        .toggle-switch.enabled::after {
+            transform: translateX(20px);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .quick-action {
+            flex: 1;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .quick-action:hover {
+            background: #e9ecef;
+        }
+        
+        .footer {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body>
-    <h3>🤖 Multi LLM Broadcaster</h3>
-    <textarea id="prompt" placeholder="Enter your prompt here... It will be sent to all open ChatGPT and DeepSeek tabs."></textarea>
-    <button id="send">Send to All LLMs</button>
+    <div class="header">
+        <h1>🤖 Multi LLM Hub</h1>
+        <p>Chat with multiple AI assistants simultaneously</p>
+    </div>
 
+    <div class="tabs">
+        <div class="tab active" data-tab="search">🔍 Search</div>
+        <div class="tab" data-tab="settings">⚙️ Settings</div>
+    </div>
+
+    <!-- Search Tab -->
+    <div class="tab-content active" id="search-tab">
+        <div class="search-section">
+            <textarea 
+                id="prompt-input" 
+                class="prompt-input" 
+                placeholder="Ask anything... Your prompt will be sent to all enabled LLMs"
+            ></textarea>
+        </div>
+
+        <div class="llm-selector">
+            <h3>Active LLMs (<span id="active-count">0</span>)</h3>
+            <div class="llm-chips" id="llm-chips"></div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button id="send-button" class="send-button" style="flex: 2;">
+                Send to All LLMs
+            </button>
+            <button id="open-all-button" class="send-button" style="flex: 1; background: #28a745;">
+                🚀 Open All
+            </button>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="settings-tab">
+        <div class="settings-section">
+            <h3>🎯 LLM Configuration</h3>
+            <div class="llm-list" id="llm-list"></div>
+            
+            <div class="quick-actions">
+                <div class="quick-action" id="enable-all">Enable All</div>
+                <div class="quick-action" id="disable-all">Disable All</div>
+                <div class="quick-action" id="reset-settings">Reset</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <a href="#" id="open-settings">Advanced Settings</a>
+    </div>
+
+    <script src="llm-config.js"></script>
     <script src="popup.js"></script>
 </body>
 </html>
