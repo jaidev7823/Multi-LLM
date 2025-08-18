@@ -21,7 +21,7 @@
     "*://chat.mistral.ai/*",
     "*://chat.cohere.com/*",
     "*://coral.cohere.com/*",
-    "*://huggingface.co/*",
+    "*://grok.com/*",
     "*://you.com/*",
     "*://*.you.com/*",
     "*://perplexity.ai/*",
@@ -30,10 +30,22 @@
     "*://replicate.com/*"
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "logo/logo.png",
+      "32": "logo/logo.png",
+      "48": "logo/logo.png",
+      "128": "logo/logo.png"
+    }
   },
   "background": {
     "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "logo/logo.png",
+    "32": "logo/logo.png",
+    "48": "logo/logo.png",
+    "128": "logo/logo.png"
   },
   "content_scripts": [
     {
@@ -49,7 +61,7 @@
         "*://chat.mistral.ai/*",
         "*://chat.cohere.com/*",
         "*://coral.cohere.com/*",
-        "*://huggingface.co/*",
+        "*://grok.com/*",
         "*://you.com/*",
         "*://*.you.com/*",
         "*://perplexity.ai/*",

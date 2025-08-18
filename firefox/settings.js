@@ -107,7 +107,9 @@ class SettingsManager {
                 card.innerHTML = `
                     <div class="llm-header">
                         <div class="llm-info">
-                            <div class="llm-icon">${config.icon}</div>
+                            <div class="llm-icon">
+                                <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:24px;height:24px;object-fit:contain;margin-right:10px;" onload="this.nextElementSibling.style.display='none'" onerror="this.style.display='none'">
+                            </div>
                             <div class="llm-details">
                                 <h3>${config.name}</h3>
                                 <p>${config.category}</p>
@@ -238,7 +240,8 @@ class SettingsManager {
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         ${recentlyUsed.map(([llmId, setting]) => `
                             <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
-                                <span style="font-size: 18px;">${this.llmConfig[llmId]?.icon || '🤖'}</span>
+                                <img src="${this.llmConfig[llmId]?.iconUrl || `llm-logo/${llmId}.png`}" alt="${this.llmConfig[llmId]?.name || llmId}" style="width:18px;height:18px;object-fit:contain;" onload="this.nextElementSibling.style.display='none'" onerror="this.style.display='none'">
+                                <span class="emoji-fallback" style="font-size: 18px;">${this.llmConfig[llmId]?.icon || '🤖'}</span>
                                 <div>
                                     <strong>${this.llmConfig[llmId]?.name || llmId}</strong>
                                     <p style="font-size: 12px; color: #6c757d; margin: 0;">

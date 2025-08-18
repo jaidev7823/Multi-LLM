@@ -7,6 +7,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             name: 'ChatGPT',
             url: 'https://chatgpt.com',
             icon: '🤖',
+            iconUrl: 'llm-logo/chatgpt.png',
             category: 'OpenAI',
             selectors: {
                 input: [
@@ -33,7 +34,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'claude',
             name: 'Claude (Anthropic)',
             url: 'https://claude.ai',
-            icon: '🧠',
+            iconUrl: 'llm-logo/claude.png',
             category: 'Anthropic',
             selectors: {
                 input: [
@@ -55,7 +56,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'gemini',
             name: 'Gemini',
             url: 'https://gemini.google.com',
-            icon: '✨',
+            iconUrl: 'llm-logo/gemini.png',
             category: 'Google',
             selectors: {
                 input: [
@@ -77,7 +78,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'deepseek',
             name: 'DeepSeek',
             url: 'https://chat.deepseek.com',
-            icon: '🔍',
+            iconUrl: 'llm-logo/deepseek.png',
             category: 'DeepSeek',
             selectors: {
                 input: [
@@ -99,7 +100,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'poe',
             name: 'Poe',
             url: 'https://poe.com',
-            icon: '🎭',
+            iconUrl: 'llm-logo/poe.png',
             category: 'Quora',
             selectors: {
                 input: [
@@ -120,7 +121,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'mistral',
             name: 'Mistral AI',
             url: 'https://chat.mistral.ai',
-            icon: '🌪️',
+            iconUrl: 'llm-logo/mistral.png',
             category: 'Mistral',
             selectors: {
                 input: [
@@ -141,7 +142,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'cohere',
             name: 'Cohere',
             url: 'https://coral.cohere.com',
-            icon: '🔗',
+            iconUrl: 'llm-logo/cohere.png',
             category: 'Cohere',
             selectors: {
                 input: [
@@ -163,7 +164,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'perplexity',
             name: 'Perplexity',
             url: 'https://perplexity.ai',
-            icon: '🔮',
+            iconUrl: 'llm-logo/perplexity.png',
             category: 'Perplexity',
             selectors: {
                 input: [
@@ -185,7 +186,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             id: 'you',
             name: 'You.com',
             url: 'https://you.com',
-            icon: '🔍',
+            iconUrl: 'llm-logo/you.png',
             category: 'You.com',
             selectors: {
                 input: [
@@ -200,19 +201,21 @@ if (typeof LLM_CONFIG === 'undefined') {
             enabled: true
         },
 
-        huggingface: {
-            id: 'huggingface',
-            name: 'HuggingFace Chat',
-            url: 'https://huggingface.co/chat',
-            icon: '🤗',
-            category: 'HuggingFace',
+        grok: {
+            id: 'grok',
+            name: 'Grok',
+            url: 'https://grok.com/',
+            iconUrl: 'llm-logo/grok.png',
+            category: 'Grok',
             selectors: {
                 input: [
-                    'textarea[placeholder*="Ask anything"]',
+                    'textarea[aria-label="Ask Grok anything"]',
+                    'textarea[class*="bg-transparent"]',
                     'textarea',
                     'div[contenteditable="true"]'
                 ],
                 submit: [
+                    'button[aria-label*="Send"]',
                     'button[type="submit"]',
                     'button:has(svg)'
                 ]
