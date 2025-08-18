@@ -42,7 +42,9 @@ class LLMInjector {
     }
 
     setupMessageListener() {
-        chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        // Use browser API for Firefox compatibility
+        const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+        browserAPI.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             if (msg.action === "injectPrompt") {
                 console.log('Received prompt injection request:', msg.prompt);
                 this.handlePromptInjection(msg, sendResponse);

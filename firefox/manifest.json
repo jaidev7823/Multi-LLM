@@ -1,0 +1,71 @@
+{
+    "manifest_version": 2,
+    "name": "Multi LLM Hub",
+    "version": "1.0",
+    "description": "Interact with multiple LLMs from one interface - ChatGPT, Claude, Gemini, and more",
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage",
+        "*://chat.openai.com/*",
+        "*://chatgpt.com/*",
+        "*://claude.ai/*",
+        "*://gemini.google.com/*",
+        "*://bard.google.com/*",
+        "*://chat.deepseek.com/*",
+        "*://*.deepseek.com/*",
+        "*://poe.com/*",
+        "*://chat.mistral.ai/*",
+        "*://chat.cohere.com/*",
+        "*://huggingface.co/*",
+        "*://you.com/*",
+        "*://perplexity.ai/*",
+        "*://character.ai/*",
+        "*://replicate.com/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://chat.openai.com/*",
+                "*://chatgpt.com/*",
+                "*://claude.ai/*",
+                "*://gemini.google.com/*",
+                "*://bard.google.com/*",
+                "*://chat.deepseek.com/*",
+                "*://*.deepseek.com/*",
+                "*://poe.com/*",
+                "*://chat.mistral.ai/*",
+                "*://chat.cohere.com/*",
+                "*://huggingface.co/*",
+                "*://you.com/*",
+                "*://perplexity.ai/*",
+                "*://character.ai/*",
+                "*://replicate.com/*"
+            ],
+            "js": [
+                "llm-config.js",
+                "content.js"
+            ]
+        }
+    ],
+    "background": {
+        "scripts": [
+            "llm-config.js",
+            "background-firefox.js"
+        ],
+        "persistent": false
+    },
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "options_ui": {
+        "page": "settings.html",
+        "open_in_tab": true
+    },
+    "applications": {
+        "gecko": {
+            "id": "multi-llm-hub@example.com",
+            "strict_min_version": "57.0"
+        }
+    }
+}

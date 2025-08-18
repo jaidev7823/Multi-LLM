@@ -15,7 +15,8 @@ class SettingsManager {
 
     async loadSettings() {
         try {
-            const response = await chrome.runtime.sendMessage({ action: 'getSettings' });
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            const response = await browserAPI.runtime.sendMessage({ action: 'getSettings' });
             this.settings = response;
         } catch (error) {
             console.error('Failed to load settings:', error);
@@ -25,7 +26,8 @@ class SettingsManager {
 
     async loadLLMConfig() {
         try {
-            const response = await chrome.runtime.sendMessage({ action: 'getLLMConfig' });
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            const response = await browserAPI.runtime.sendMessage({ action: 'getLLMConfig' });
             this.llmConfig = response.config;
         } catch (error) {
             console.error('Failed to load LLM config:', error);
@@ -99,7 +101,7 @@ class SettingsManager {
             llms.forEach(({ llmId, config }) => {
                 const isEnabled = this.settings.llmSettings[llmId]?.enabled || false;
                 const lastUsed = this.settings.llmSettings[llmId]?.lastUsed;
-                
+
                 const card = document.createElement('div');
                 card.className = `llm-card ${isEnabled ? 'enabled' : ''}`;
                 card.innerHTML = `
@@ -161,9 +163,9 @@ class SettingsManager {
         preferences.forEach(pref => {
             const item = document.createElement('div');
             item.className = 'preference-item';
-            
+
             const currentValue = this.settings.preferences[pref.key];
-            
+
             if (pref.type === 'toggle') {
                 item.innerHTML = `
                     <div class="preference-info">
@@ -178,7 +180,7 @@ class SettingsManager {
                     this.togglePreference(pref.key);
                 });
             } else if (pref.type === 'select') {
-                const options = pref.options.map(opt => 
+                const options = pref.options.map(opt =>
                     `<option value="${opt}" ${currentValue === opt ? 'selected' : ''}>${opt}</option>`
                 ).join('');
 
@@ -204,11 +206,11 @@ class SettingsManager {
 
     renderStatistics() {
         const container = document.getElementById('stats-content');
-        
+
         const totalLLMs = Object.keys(this.llmConfig).length;
         const enabledLLMs = Object.values(this.settings.llmSettings)
             .filter(setting => setting.enabled).length;
-        
+
         const recentlyUsed = Object.entries(this.settings.llmSettings)
             .filter(([_, setting]) => setting.lastUsed)
             .sort(([_, a], [__, b]) => (b.lastUsed || 0) - (a.lastUsed || 0))
@@ -253,11 +255,11 @@ class SettingsManager {
 
     toggleLLM(llmId) {
         const currentState = this.settings.llmSettings[llmId]?.enabled || false;
-        
+
         if (!this.settings.llmSettings[llmId]) {
             this.settings.llmSettings[llmId] = {};
         }
-        
+
         this.settings.llmSettings[llmId].enabled = !currentState;
         this.renderLLMGrid();
     }
@@ -295,17 +297,18 @@ class SettingsManager {
         this.showStatus(`Opening ${enabledLLMs.length} LLM tab${enabledLLMs.length > 1 ? 's' : ''}...`, 'success');
 
         try {
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
             let openedCount = 0;
             for (const llmId of enabledLLMs) {
-                const response = await chrome.runtime.sendMessage({
+                const response = await browserAPI.runtime.sendMessage({
                     action: 'openLLM',
                     llmId: llmId
                 });
-                
+
                 if (response.success) {
                     openedCount++;
                 }
-                
+
                 // Small delay between opening tabs to avoid overwhelming the browser
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
@@ -323,7 +326,8 @@ class SettingsManager {
 
     async saveSettings() {
         try {
-            await chrome.runtime.sendMessage({
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            await browserAPI.runtime.sendMessage({
                 action: 'updateSettings',
                 settings: this.settings
             });
@@ -358,12 +362,12 @@ class SettingsManager {
     exportSettings() {
         const dataStr = JSON.stringify(this.settings, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        
+
         const link = document.createElement('a');
         link.href = URL.createObjectURL(dataBlob);
         link.download = 'multi-llm-hub-settings.json';
         link.click();
-        
+
         this.showStatus('Settings exported successfully!', 'success');
     }
 
@@ -371,7 +375,7 @@ class SettingsManager {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json';
-        
+
         input.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -389,7 +393,7 @@ class SettingsManager {
                 reader.readAsText(file);
             }
         };
-        
+
         input.click();
     }
 

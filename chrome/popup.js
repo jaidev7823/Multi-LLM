@@ -15,7 +15,9 @@ class MultiLLMPopup {
 
     async loadSettings() {
         try {
-            const response = await chrome.runtime.sendMessage({ action: 'getSettings' });
+            // Use browser API for Firefox compatibility
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            const response = await browserAPI.runtime.sendMessage({ action: 'getSettings' });
             this.settings = response;
         } catch (error) {
             console.error('Failed to load settings:', error);
@@ -25,7 +27,9 @@ class MultiLLMPopup {
 
     async loadLLMConfig() {
         try {
-            const response = await chrome.runtime.sendMessage({ action: 'getLLMConfig' });
+            // Use browser API for Firefox compatibility
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            const response = await browserAPI.runtime.sendMessage({ action: 'getLLMConfig' });
             this.llmConfig = response.config;
         } catch (error) {
             console.error('Failed to load LLM config:', error);
@@ -65,7 +69,8 @@ class MultiLLMPopup {
 
         // Open advanced settings
         document.getElementById('open-settings').addEventListener('click', () => {
-            chrome.runtime.openOptionsPage();
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            browserAPI.runtime.openOptionsPage();
         });
 
         // Enter key in textarea
@@ -198,7 +203,8 @@ class MultiLLMPopup {
 
     async saveSettings() {
         try {
-            await chrome.runtime.sendMessage({
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            await browserAPI.runtime.sendMessage({
                 action: 'updateSettings',
                 settings: this.settings
             });
@@ -242,9 +248,10 @@ class MultiLLMPopup {
         this.showStatus(`Opening ${enabledLLMs.length} LLM tab${enabledLLMs.length > 1 ? 's' : ''}...`, 'info');
 
         try {
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
             let openedCount = 0;
             for (const llmId of enabledLLMs) {
-                const response = await chrome.runtime.sendMessage({
+                const response = await browserAPI.runtime.sendMessage({
                     action: 'openLLM',
                     llmId: llmId
                 });
@@ -284,7 +291,8 @@ class MultiLLMPopup {
         this.showStatus(`Sending prompt to ${enabledCount} LLM${enabledCount > 1 ? 's' : ''}...`, 'info');
 
         try {
-            const response = await chrome.runtime.sendMessage({
+            const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+            const response = await browserAPI.runtime.sendMessage({
                 action: 'broadcastPrompt',
                 prompt: prompt
             });
