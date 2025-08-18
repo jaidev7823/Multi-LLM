@@ -26,6 +26,21 @@
         "*://character.ai/*",
         "*://replicate.com/*"
     ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "logo/logo.png",
+            "32": "logo/logo.png",
+            "48": "logo/logo.png",
+            "128": "logo/logo.png"
+        }
+    },
+    "icons": {
+        "16": "logo/logo.png",
+        "32": "logo/logo.png",
+        "48": "logo/logo.png",
+        "128": "logo/logo.png"
+    },
     "content_scripts": [
         {
             "matches": [
@@ -63,6 +78,15 @@
     },
     "browser_action": {
         "default_popup": "popup.html"
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Shift+Alt+D",
+                "mac": "Shift+Alt+D"
+            },
+            "description": "Open Multi LLM Hub"
+        }
     },
     "options_ui": {
         "page": "settings.html",

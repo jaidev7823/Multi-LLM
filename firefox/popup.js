@@ -109,7 +109,7 @@ class MultiLLMPopup {
             const chip = document.createElement('div');
             chip.className = `llm-chip ${isEnabled ? 'enabled' : ''}`;
             chip.innerHTML = `
-                <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:18px;height:18px;object-fit:contain;margin-right:6px;" onload="this.nextElementSibling.style.display='none'" onerror="this.style.display='none'">
+                <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:18px;height:18px;object-fit:contain;margin-right:6px;" onerror="this.style.display='none'">
                 <span>${config.name}</span>
             `;
             
@@ -143,7 +143,7 @@ class MultiLLMPopup {
                 item.innerHTML = `
                     <div class="llm-info">
                         <div class="llm-icon">
-                            <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:20px;height:20px;object-fit:contain;margin-right:10px;" onload="this.nextElementSibling.style.display='none'" onerror="this.style.display='none'">
+                            <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:20px;height:20px;object-fit:contain;margin-right:10px;" onerror="this.style.display='none'">
                         </div>
                         <div class="llm-details">
                             <h4>${config.name}</h4>
@@ -230,10 +230,10 @@ class MultiLLMPopup {
         
         if (enabledCount === 0) {
             sendButton.textContent = 'No LLMs Selected';
-            openAllButton.textContent = '🚀 Open All';
+            openAllButton.textContent = 'Open All';
         } else {
             sendButton.textContent = `Send to ${enabledCount} LLM${enabledCount > 1 ? 's' : ''}`;
-            openAllButton.textContent = `🚀 Open ${enabledCount}`;
+            openAllButton.textContent = `Open ${enabledCount}`;
         }
     }
 
