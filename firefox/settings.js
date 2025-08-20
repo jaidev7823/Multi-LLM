@@ -104,29 +104,77 @@ class SettingsManager {
 
                 const card = document.createElement('div');
                 card.className = `llm-card ${isEnabled ? 'enabled' : ''}`;
-                card.innerHTML = `
-                    <div class="llm-header">
-                        <div class="llm-info">
-                            <div class="llm-icon">
-                                <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:24px;height:24px;object-fit:contain;margin-right:10px;" onerror="this.style.display='none'">
-                            </div>
-                            <div class="llm-details">
-                                <h3>${config.name}</h3>
-                                <p>${config.category}</p>
-                            </div>
-                        </div>
-                        <div class="toggle-switch ${isEnabled ? 'enabled' : ''}" data-llm="${llmId}"></div>
-                    </div>
-                    
-                    <div class="llm-url">${config.url}</div>
-                    
-                    <div class="llm-stats">
-                        <span>Status: <strong>${isEnabled ? 'Enabled' : 'Disabled'}</strong></span>
-                        <span>Last Used: ${lastUsed ? this.formatDate(lastUsed) : 'Never'}</span>
-                    </div>
-                `;
+                
+                // Create llm-header div
+                const llmHeader = document.createElement('div');
+                llmHeader.className = 'llm-header';
+                
+                // Create llm-info div
+                const llmInfo = document.createElement('div');
+                llmInfo.className = 'llm-info';
+                
+                // Create llm-icon div
+                const llmIcon = document.createElement('div');
+                llmIcon.className = 'llm-icon';
+                
+                const img = document.createElement('img');
+                img.src = config.iconUrl || `llm-logo/${llmId}.png`;
+                img.alt = config.name;
+                img.style.cssText = 'width:24px;height:24px;object-fit:contain;margin-right:10px;';
+                img.onerror = function() { this.style.display = 'none'; };
+                
+                llmIcon.appendChild(img);
+                
+                // Create llm-details div
+                const llmDetails = document.createElement('div');
+                llmDetails.className = 'llm-details';
+                
+                const h3 = document.createElement('h3');
+                h3.textContent = config.name;
+                
+                const p = document.createElement('p');
+                p.textContent = config.category;
+                
+                llmDetails.appendChild(h3);
+                llmDetails.appendChild(p);
+                
+                llmInfo.appendChild(llmIcon);
+                llmInfo.appendChild(llmDetails);
+                
+                // Create toggle switch
+                const toggle = document.createElement('div');
+                toggle.className = `toggle-switch ${isEnabled ? 'enabled' : ''}`;
+                toggle.dataset.llm = llmId;
+                
+                llmHeader.appendChild(llmInfo);
+                llmHeader.appendChild(toggle);
+                
+                // Create llm-url div
+                const llmUrl = document.createElement('div');
+                llmUrl.className = 'llm-url';
+                llmUrl.textContent = config.url;
+                
+                // Create llm-stats div
+                const llmStats = document.createElement('div');
+                llmStats.className = 'llm-stats';
+                
+                const statusSpan = document.createElement('span');
+                statusSpan.textContent = 'Status: ';
+                
+                const strong = document.createElement('strong');
+                strong.textContent = isEnabled ? 'Enabled' : 'Disabled';
+                statusSpan.appendChild(strong);
+                
+                const lastUsedSpan = document.createElement('span');
+                lastUsedSpan.textContent = `Last Used: ${lastUsed ? this.formatDate(lastUsed) : 'Never'}`;
+                
+                llmStats.appendChild(statusSpan);
+                llmStats.appendChild(lastUsedSpan);
+                
+                card.appendChild(llmHeader);
+                card.appendChild(llmUrl);
+                card.appendChild(llmStats);
 
-                const toggle = card.querySelector('.toggle-switch');
                 toggle.addEventListener('click', () => {
                     this.toggleLLM(llmId);
                 });
@@ -169,34 +217,62 @@ class SettingsManager {
             const currentValue = this.settings.preferences[pref.key];
 
             if (pref.type === 'toggle') {
-                item.innerHTML = `
-                    <div class="preference-info">
-                        <h4>${pref.title}</h4>
-                        <p>${pref.description}</p>
-                    </div>
-                    <div class="toggle-switch ${currentValue ? 'enabled' : ''}" data-pref="${pref.key}"></div>
-                `;
+                // Create preference-info div
+                const preferenceInfo = document.createElement('div');
+                preferenceInfo.className = 'preference-info';
+                
+                const h4 = document.createElement('h4');
+                h4.textContent = pref.title;
+                
+                const p = document.createElement('p');
+                p.textContent = pref.description;
+                
+                preferenceInfo.appendChild(h4);
+                preferenceInfo.appendChild(p);
+                
+                // Create toggle switch
+                const toggle = document.createElement('div');
+                toggle.className = `toggle-switch ${currentValue ? 'enabled' : ''}`;
+                toggle.dataset.pref = pref.key;
+                
+                item.appendChild(preferenceInfo);
+                item.appendChild(toggle);
 
-                const toggle = item.querySelector('.toggle-switch');
                 toggle.addEventListener('click', () => {
                     this.togglePreference(pref.key);
                 });
             } else if (pref.type === 'select') {
-                const options = pref.options.map(opt =>
-                    `<option value="${opt}" ${currentValue === opt ? 'selected' : ''}>${opt}</option>`
-                ).join('');
+                // Create preference-info div
+                const preferenceInfo = document.createElement('div');
+                preferenceInfo.className = 'preference-info';
+                
+                const h4 = document.createElement('h4');
+                h4.textContent = pref.title;
+                
+                const p = document.createElement('p');
+                p.textContent = pref.description;
+                
+                preferenceInfo.appendChild(h4);
+                preferenceInfo.appendChild(p);
+                
+                // Create select element
+                const select = document.createElement('select');
+                select.dataset.pref = pref.key;
+                select.style.cssText = 'padding: 8px; border-radius: 4px; border: 1px solid #ddd;';
+                
+                pref.options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.textContent = opt;
+                    if (currentValue === opt) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+                
+                item.appendChild(preferenceInfo);
+                item.appendChild(select);
 
-                item.innerHTML = `
-                    <div class="preference-info">
-                        <h4>${pref.title}</h4>
-                        <p>${pref.description}</p>
-                    </div>
-                    <select data-pref="${pref.key}" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
-                        ${options}
-                    </select>
-                `;
-
-                const select = item.querySelector('select');
                 select.addEventListener('change', (e) => {
                     this.updatePreference(pref.key, e.target.value);
                 });
@@ -218,41 +294,104 @@ class SettingsManager {
             .sort(([_, a], [__, b]) => (b.lastUsed || 0) - (a.lastUsed || 0))
             .slice(0, 3);
 
-        container.innerHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                    <h3 style="font-size: 24px; color: #667eea; margin-bottom: 8px;">${totalLLMs}</h3>
-                    <p>Total LLMs</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                    <h3 style="font-size: 24px; color: #28a745; margin-bottom: 8px;">${enabledLLMs}</h3>
-                    <p>Enabled LLMs</p>
-                </div>
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
-                    <h3 style="font-size: 24px; color: #ffc107; margin-bottom: 8px;">${totalLLMs - enabledLLMs}</h3>
-                    <p>Disabled LLMs</p>
-                </div>
-            </div>
+        // Clear container
+        container.innerHTML = '';
+        
+        // Create stats grid
+        const statsGrid = document.createElement('div');
+        statsGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;';
+        
+        // Total LLMs card
+        const totalCard = document.createElement('div');
+        totalCard.style.cssText = 'background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;';
+        
+        const totalH3 = document.createElement('h3');
+        totalH3.style.cssText = 'font-size: 24px; color: #667eea; margin-bottom: 8px;';
+        totalH3.textContent = totalLLMs;
+        
+        const totalP = document.createElement('p');
+        totalP.textContent = 'Total LLMs';
+        
+        totalCard.appendChild(totalH3);
+        totalCard.appendChild(totalP);
+        
+        // Enabled LLMs card
+        const enabledCard = document.createElement('div');
+        enabledCard.style.cssText = 'background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;';
+        
+        const enabledH3 = document.createElement('h3');
+        enabledH3.style.cssText = 'font-size: 24px; color: #28a745; margin-bottom: 8px;';
+        enabledH3.textContent = enabledLLMs;
+        
+        const enabledP = document.createElement('p');
+        enabledP.textContent = 'Enabled LLMs';
+        
+        enabledCard.appendChild(enabledH3);
+        enabledCard.appendChild(enabledP);
+        
+        // Disabled LLMs card
+        const disabledCard = document.createElement('div');
+        disabledCard.style.cssText = 'background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;';
+        
+        const disabledH3 = document.createElement('h3');
+        disabledH3.style.cssText = 'font-size: 24px; color: #ffc107; margin-bottom: 8px;';
+        disabledH3.textContent = totalLLMs - enabledLLMs;
+        
+        const disabledP = document.createElement('p');
+        disabledP.textContent = 'Disabled LLMs';
+        
+        disabledCard.appendChild(disabledH3);
+        disabledCard.appendChild(disabledP);
+        
+        statsGrid.appendChild(totalCard);
+        statsGrid.appendChild(enabledCard);
+        statsGrid.appendChild(disabledCard);
+        
+        container.appendChild(statsGrid);
+        
+        // Recently Used section
+        if (recentlyUsed.length > 0) {
+            const recentlySection = document.createElement('div');
+            recentlySection.style.marginTop = '25px';
             
-            ${recentlyUsed.length > 0 ? `
-                <div style="margin-top: 25px;">
-                    <h4 style="margin-bottom: 15px;">Recently Used LLMs</h4>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        ${recentlyUsed.map(([llmId, setting]) => `
-                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8f9fa; border-radius: 6px;">
-                                <img src="${this.llmConfig[llmId]?.iconUrl || `llm-logo/${llmId}.png`}" alt="${this.llmConfig[llmId]?.name || llmId}" style="width:18px;height:18px;object-fit:contain;" onerror="this.style.display='none'">
-                                <div>
-                                    <strong>${this.llmConfig[llmId]?.name || llmId}</strong>
-                                    <p style="font-size: 12px; color: #6c757d; margin: 0;">
-                                        Last used: ${this.formatDate(setting.lastUsed)}
-                                    </p>
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        `;
+            const recentlyH4 = document.createElement('h4');
+            recentlyH4.style.marginBottom = '15px';
+            recentlyH4.textContent = 'Recently Used LLMs';
+            
+            const recentlyList = document.createElement('div');
+            recentlyList.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
+            
+            recentlyUsed.forEach(([llmId, setting]) => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8f9fa; border-radius: 6px;';
+                
+                const img = document.createElement('img');
+                img.src = this.llmConfig[llmId]?.iconUrl || `llm-logo/${llmId}.png`;
+                img.alt = this.llmConfig[llmId]?.name || llmId;
+                img.style.cssText = 'width:18px;height:18px;object-fit:contain;';
+                img.onerror = function() { this.style.display = 'none'; };
+                
+                const details = document.createElement('div');
+                
+                const strong = document.createElement('strong');
+                strong.textContent = this.llmConfig[llmId]?.name || llmId;
+                
+                const p = document.createElement('p');
+                p.style.cssText = 'font-size: 12px; color: #6c757d; margin: 0;';
+                p.textContent = `Last used: ${this.formatDate(setting.lastUsed)}`;
+                
+                details.appendChild(strong);
+                details.appendChild(p);
+                
+                item.appendChild(img);
+                item.appendChild(details);
+                recentlyList.appendChild(item);
+            });
+            
+            recentlySection.appendChild(recentlyH4);
+            recentlySection.appendChild(recentlyList);
+            container.appendChild(recentlySection);
+        }
     }
 
     toggleLLM(llmId) {

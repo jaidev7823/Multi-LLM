@@ -57,6 +57,10 @@ class LLMInjector {
                 console.log('Received prompt injection request:', msg.prompt);
                 this.handlePromptInjection(msg, sendResponse);
                 return true; // Async response
+            } else if (msg.action === "ping") {
+                console.log('Received ping from background script');
+                sendResponse({ success: true, message: 'Content script active' });
+                return false; // Synchronous response
             }
         });
     }

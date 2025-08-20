@@ -32,6 +32,24 @@ browser.runtime.onInstalled.addListener(async () => {
   }
 });
 
+// Listen for tab updates to ensure content scripts are loaded
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.url) {
+    const llmId = findLLMByUrl(tab.url);
+    if (llmId) {
+      console.log(`LLM tab updated: ${llmId} in tab ${tabId}`);
+      // Content scripts should be automatically injected via manifest
+      // but we can verify they're working by sending a ping
+      try {
+        await browser.tabs.sendMessage(tabId, { action: 'ping' });
+        console.log(`Content script confirmed active in tab ${tabId}`);
+      } catch (error) {
+        console.log(`Content script not active in tab ${tabId}, will inject manually when needed`);
+      }
+    }
+  }
+});
+
 // Handle messages from popup and content scripts
 browser.runtime.onMessage.addListener(async (message, sender) => {
   console.log('Received message:', message);
@@ -74,13 +92,83 @@ async function broadcastToEnabledLLMs(prompt) {
       if (!llmId || !settings.llmSettings[llmId]?.enabled) continue;
       
       try {
-        // Firefox doesn't need manual script injection for content scripts
-        // Send prompt directly
-        const response = await browser.tabs.sendMessage(tab.id, { 
-          action: 'injectPrompt', 
-          prompt: prompt,
-          llmConfig: LLM_CONFIG[llmId]
-        });
+        // For Firefox, we need to ensure content scripts are active
+        // Try to send message first, if it fails, inject scripts manually
+        let response;
+        try {
+          response = await browser.tabs.sendMessage(tab.id, { 
+            action: 'injectPrompt', 
+            prompt: prompt,
+            llmConfig: LLM_CONFIG[llmId]
+          });
+        } catch (messageError) {
+          console.log(`Content script not active in tab ${tab.id}, injecting manually...`);
+          
+          // For Firefox, we need to activate the tab briefly to ensure content scripts load
+          // Store current active tab to restore later
+          const currentTabs = await browser.tabs.query({ active: true, currentWindow: true });
+          const currentActiveTab = currentTabs[0];
+          
+          try {
+            // First try to inject scripts without activating the tab
+            try {
+              await browser.tabs.executeScript(tab.id, {
+                file: 'llm-config.js'
+              });
+              await browser.tabs.executeScript(tab.id, {
+                file: 'content.js'
+              });
+              
+              // Wait a bit for scripts to initialize
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              // Try sending message
+              response = await browser.tabs.sendMessage(tab.id, { 
+                action: 'injectPrompt', 
+                prompt: prompt,
+                llmConfig: LLM_CONFIG[llmId]
+              });
+            } catch (injectionError) {
+              console.log('Direct injection failed, trying with tab activation...');
+              
+              // Activate the target tab briefly as fallback
+              await browser.tabs.update(tab.id, { active: true });
+              
+              // Wait for content scripts to load
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              
+              // Inject content scripts manually for inactive tabs
+              await browser.tabs.executeScript(tab.id, {
+                file: 'llm-config.js'
+              });
+              await browser.tabs.executeScript(tab.id, {
+                file: 'content.js'
+              });
+              
+              // Wait a bit for scripts to initialize
+              await new Promise(resolve => setTimeout(resolve, 500));
+              
+              // Try sending message again
+              response = await browser.tabs.sendMessage(tab.id, { 
+                action: 'injectPrompt', 
+                prompt: prompt,
+                llmConfig: LLM_CONFIG[llmId]
+              });
+              
+              // Restore the original active tab
+              if (currentActiveTab) {
+                await browser.tabs.update(currentActiveTab.id, { active: true });
+              }
+            }
+          } catch (activationError) {
+            console.error('Error with tab activation:', activationError);
+            // Restore the original active tab even if there was an error
+            if (currentActiveTab) {
+              await browser.tabs.update(currentActiveTab.id, { active: true });
+            }
+            throw activationError;
+          }
+        }
         
         results.push({
           llmId,

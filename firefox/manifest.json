@@ -26,20 +26,20 @@
         "*://character.ai/*",
         "*://replicate.com/*"
     ],
-    "action": {
+    "icons": {
+        "16": "logo/icon-16.png",
+        "32": "logo/icon-32.png",
+        "48": "logo/icon-48.png",
+        "128": "logo/icon-128.png"
+    },
+    "browser_action": {
         "default_popup": "popup.html",
         "default_icon": {
-            "16": "logo/logo.png",
-            "32": "logo/logo.png",
-            "48": "logo/logo.png",
-            "128": "logo/logo.png"
+            "16": "logo/icon-16.png",
+            "32": "logo/icon-32.png",
+            "48": "logo/icon-48.png",
+            "128": "logo/icon-128.png"
         }
-    },
-    "icons": {
-        "16": "logo/logo.png",
-        "32": "logo/logo.png",
-        "48": "logo/logo.png",
-        "128": "logo/logo.png"
     },
     "content_scripts": [
         {
@@ -74,10 +74,7 @@
             "llm-config.js",
             "background-firefox.js"
         ],
-        "persistent": false
-    },
-    "browser_action": {
-        "default_popup": "popup.html"
+        "persistent": true
     },
     "commands": {
         "_execute_browser_action": {
@@ -92,10 +89,9 @@
         "page": "settings.html",
         "open_in_tab": true
     },
-    "applications": {
+    "browser_specific_settings": {
         "gecko": {
-            "id": "multi-llm-hub@example.com",
-            "strict_min_version": "57.0"
+            "id": "jaidev7823@gmail.com"
         }
     }
 }

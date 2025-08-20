@@ -108,10 +108,20 @@ class MultiLLMPopup {
             
             const chip = document.createElement('div');
             chip.className = `llm-chip ${isEnabled ? 'enabled' : ''}`;
-            chip.innerHTML = `
-                <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:18px;height:18px;object-fit:contain;margin-right:6px;" onerror="this.style.display='none'">
-                <span>${config.name}</span>
-            `;
+            
+            // Create image element
+            const img = document.createElement('img');
+            img.src = config.iconUrl || `llm-logo/${llmId}.png`;
+            img.alt = config.name;
+            img.style.cssText = 'width:18px;height:18px;object-fit:contain;margin-right:6px;';
+            img.onerror = function() { this.style.display = 'none'; };
+            
+            // Create span element
+            const span = document.createElement('span');
+            span.textContent = config.name;
+            
+            chip.appendChild(img);
+            chip.appendChild(span);
             
             chip.addEventListener('click', () => {
                 this.toggleLLM(llmId);
@@ -140,20 +150,47 @@ class MultiLLMPopup {
                 
                 const item = document.createElement('div');
                 item.className = 'llm-item';
-                item.innerHTML = `
-                    <div class="llm-info">
-                        <div class="llm-icon">
-                            <img src="${config.iconUrl || `llm-logo/${llmId}.png`}" alt="${config.name}" style="width:20px;height:20px;object-fit:contain;margin-right:10px;" onerror="this.style.display='none'">
-                        </div>
-                        <div class="llm-details">
-                            <h4>${config.name}</h4>
-                            <p>${config.category} • ${new URL(config.url).hostname}</p>
-                        </div>
-                    </div>
-                    <div class="toggle-switch ${isEnabled ? 'enabled' : ''}" data-llm="${llmId}"></div>
-                `;
-
-                const toggle = item.querySelector('.toggle-switch');
+                
+                // Create llm-info div
+                const llmInfo = document.createElement('div');
+                llmInfo.className = 'llm-info';
+                
+                // Create llm-icon div
+                const llmIcon = document.createElement('div');
+                llmIcon.className = 'llm-icon';
+                
+                const img = document.createElement('img');
+                img.src = config.iconUrl || `llm-logo/${llmId}.png`;
+                img.alt = config.name;
+                img.style.cssText = 'width:20px;height:20px;object-fit:contain;margin-right:10px;';
+                img.onerror = function() { this.style.display = 'none'; };
+                
+                llmIcon.appendChild(img);
+                
+                // Create llm-details div
+                const llmDetails = document.createElement('div');
+                llmDetails.className = 'llm-details';
+                
+                const h4 = document.createElement('h4');
+                h4.textContent = config.name;
+                
+                const p = document.createElement('p');
+                p.textContent = `${config.category} • ${new URL(config.url).hostname}`;
+                
+                llmDetails.appendChild(h4);
+                llmDetails.appendChild(p);
+                
+                llmInfo.appendChild(llmIcon);
+                llmInfo.appendChild(llmDetails);
+                
+                // Create toggle switch
+                const toggle = document.createElement('div');
+                toggle.className = `toggle-switch ${isEnabled ? 'enabled' : ''}`;
+                toggle.dataset.llm = llmId;
+                
+                item.appendChild(llmInfo);
+                item.appendChild(toggle);
+                
                 toggle.addEventListener('click', () => {
                     this.toggleLLM(llmId);
                 });

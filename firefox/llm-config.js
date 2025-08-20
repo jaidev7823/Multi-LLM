@@ -7,7 +7,7 @@ if (typeof LLM_CONFIG === 'undefined') {
             name: 'ChatGPT',
             url: 'https://chatgpt.com',
             icon: '🤖',
-            iconUrl: 'llm-logo/chatgpt.png',
+            iconUrl: 'llm-logo/chat-gpt.png',
             category: 'OpenAI',
             selectors: {
                 input: [
